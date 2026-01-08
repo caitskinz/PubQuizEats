@@ -133,7 +133,6 @@ ul {
 
   /* Leaderboard rows become more flexible */
   .leaderboard-row {
-    display: grid;
     grid-template-columns: 30px 1fr auto;
     align-items: center;
     column-gap: 10px;
@@ -144,16 +143,13 @@ ul {
     white-space: normal;
     word-break: break-word;
     line-height: 1.3;
+    display: inline-block;
   }
-
 
   .avg {
-    grid-column: 2;
-    text-align: left;
-  font-size: 1.2rem;
-  white-space: nowrap;
+    text-align: right;
+    white-space: nowrap;
   }
-
   /* Buttons easier to tap */
   button {
     width: 100%;
