@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wet Specimens Eat The Menu</title>
+<style>
+
+    /* ---------- Base ---------- */
+    body {
+      font-family: sans-serif;
+      background-color: #1a3e2d;
+      color: #f9f3e1;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+    }
+
+    .info,
+    .submission {
+      text-align: center;
+    }
+
+    /* ---------- Buttons ---------- */
+    button {
+      padding: 10px;
+      margin-bottom: 15px;
+      color: #1a3e2d;
+      background: #f9f3e1;
+      border-radius: 5px;
+      border: 2px solid #f9f3e1;
+      cursor: pointer;
+    }
+
+    /* ---------- Leaderboard ---------- */
+    #leaderboard {
+      background-image:
+        repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
+        repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
+        repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
+        repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px);
+      background-position: left top, right top, left bottom, left top;
+      background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+      background-size: 100% 5px, 5px 100%, 100% 5px, 5px 100%;
+      border-radius: 5px;
+      padding: 5px 12px;
+    }
+
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      padding: 8px;
+      border-bottom: 1px solid #f9f3e1;
+    }
+
+    .rank {
+      font-weight: bold;
+    }
+
+    .dish-name {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .avg {
+      text-align: right;
+    }
+
+    /* ---------- Modals ---------- */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 20%;
+      transform: translateY(-50%);
+      background: white;
+      color: #1a3e2d;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      min-width: 250px;
+      max-height: 90vh;
+  overflow-y: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    form {
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .modal-actions {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .modal-actions > button {
+      border: 2px solid #1a3e2d;
+    }
+
+    ul {
+      list-style-type: none;
+      text-align: left;
+    }
+    /* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+
+  body {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  /* Leaderboard rows become more flexible */
+  .leaderboard-row {
+    grid-template-columns: 30px 1fr;
+    grid-template-rows: auto auto;
+    row-gap: 4px;
+  }
+
+  .avg {
+    grid-column: 2;
+    text-align: left;
+    font-size: 1.1rem;
+  }
+
+  /* Buttons easier to tap */
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+
+  /* Modals take most of the screen */
+  .modal {
+    left: 5%;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: unset;
+    width: auto;
+  }
+
+  form {
+    font-size: 1rem;
+  }
+
+  label {
+    font-size: 1rem;
+  }
+
+  select {
+    font-size: 1rem;
+    padding: 8px;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+}
+
+</style>
+  
+</head>
+
+<body>
+  <div class="main">
+    <div class="info">
+      <h1>🏆 Wet Specimens Eat The Menu 🏆</h1>
+      <p class="subtitle">Eating everything at Monkey Motel</p>
+    </div>
+
+    <div class="submission">
+      <button id="add-rating-btn">Submit Rating</button>
+    </div>
+
+    <h2>Leaderboard</h2>
+    <div id="leaderboard"></div>
+
+    <!-- Rating Modal -->
+    <div id="rating-modal" class="modal hidden">
+      <form id="rating-form">
+        <h3>Submit Rating</h3>
+
+        <label>
+          Who are u?
+          <select id="person-select" required>
+            <option value="" disabled selected>Select your name</option>
+          </select>
+        </label>
+
+        <label>
+          What did u eat?
+          <select id="dish-select" required>
+            <option value="" disabled selected>Select a dish</option>
+          </select>
+        </label>
+
+        <label>
+          How was it?
+          <select id="rating" required>
+            <option value="1">⭐️</option>
+            <option value="2">⭐️⭐️</option>
+            <option value="3">⭐️⭐️⭐️</option>
+            <option value="4">⭐️⭐️⭐️⭐️</option>
+            <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
+          </select>
+        </label>
+
+        <div class="modal-actions">
+          <button type="submit">Submit</button>
+          <button type="button" id="cancel-rating">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="details-modal" class="modal hidden">
+      <h3 id="details-title"></h3>
+      <ul id="details-list"></ul>
+      <button id="close-details">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbzuto87-N3th0KIAviv3PSHVG1-d-q2xpAEmh42Y69y3qzumOD9hbZhD0olEpP9M4IX4Q/exec";
+
+    let dishesCache = [];
+    let peopleCache = [];
+    
+    function renderStars(value) {
+  if (!value) return "—";
+
+  const rounded = Math.round(value * 2) / 2;
+  let stars = "";
+
+  const fullStars = Math.floor(rounded);
+  const hasHalf = rounded % 1 !== 0;
+
+  stars += "⭐️".repeat(fullStars);
+
+  if (hasHalf) {
+    stars += "½";
+  }
+
+  return stars;
+}
+
+
+
+    /* ---------- Data Loading ---------- */
+    async function loadPeople() {
+      const res = await fetch(`${API_URL}?action=getPeople`);
+      peopleCache = await res.json();
+
+      const select = document.getElementById("person-select");
+      select.innerHTML = `<option value="" disabled selected>Select your name</option>`;
+
+      peopleCache.forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+    }
+
+    async function loadLeaderboard() {
+      const res = await fetch(`${API_URL}?action=getDishes`);
+      dishesCache = await res.json();
+
+      dishesCache.sort((a, b) => (b.average || 0) - (a.average || 0));
+
+      const board = document.getElementById("leaderboard");
+      board.innerHTML = "";
+
+      dishesCache.forEach((dish, index) => {
+        const row = document.createElement("div");
+        row.className = "leaderboard-row";
+        row.innerHTML = `
+          <span class="rank">${index + 1}</span>
+          <span class="dish-name" onclick="viewDetails(${dish.id}, '${dish.name}')">
+            ${dish.name}
+          </span>
+          <span class="avg" title="${dish.average ? dish.average.toFixed(2) : ""}">
+  ${renderStars(dish.average)}
+</span>
+        `;
+        board.appendChild(row);
+      });
+
+      populateDishSelect();
+    }
+
+    function populateDishSelect() {
+      const select = document.getElementById("dish-select");
+      select.innerHTML = `<option value="" disabled selected>Select a dish</option>`;
+
+      dishesCache.forEach(dish => {
+        const opt = document.createElement("option");
+        opt.value = dish.id;
+        opt.textContent = dish.name;
+        select.appendChild(opt);
+      });
+    }
+
+    /* ---------- Modals ---------- */
+    document.getElementById("add-rating-btn").onclick = () =>
+      document.getElementById("rating-modal").classList.remove("hidden");
+
+    document.getElementById("cancel-rating").onclick = () =>
+      document.getElementById("rating-modal").classList.add("hidden");
+
+    document.getElementById("close-details").onclick = () =>
+      document.getElementById("details-modal").classList.add("hidden");
+
+    /* ---------- Submit Rating ---------- */
+    document.getElementById("rating-form").addEventListener("submit", async e => {
+      e.preventDefault();
+
+      const data = {
+        dish_id: document.getElementById("dish-select").value,
+        person: document.getElementById("person-select").value,
+        rating: Number(document.getElementById("rating").value)
+      };
+
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+
+      document.getElementById("rating-modal").classList.add("hidden");
+      loadLeaderboard();
+    });
+
+    /* ---------- Details ---------- */
+    async function viewDetails(dishId, dishName) {
+      const res = await fetch(`${API_URL}?action=getRatings&dish_id=${dishId}`);
+      const ratings = await res.json();
+
+      document.getElementById("details-title").textContent = dishName;
+
+      const list = document.getElementById("details-list");
+      list.innerHTML = "";
+
+      ratings.forEach(r => {
+        const li = document.createElement("li");
+        li.textContent = `${r.person}: ${"⭐️".repeat(r.rating)}`;
+        list.appendChild(li);
+      });
+
+      document.getElementById("details-modal").classList.remove("hidden");
+    }
+
+    /* ---------- Init ---------- */
+    loadLeaderboard();
+    loadPeople();
+  </script>
+</body>
+</html>
