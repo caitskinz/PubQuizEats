@@ -1,191 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wet Specimens Eat The Menu</title>
-<style>
-/* ---------- Base ---------- */
-body {
-  font-family: sans-serif;
-  background-color: #1a3e2d;
-  color: #f9f3e1;
-}
+  <style>
+    /* ---------- Base ---------- */
+    body {
+      font-family: sans-serif;
+      background-color: #1a3e2d;
+      color: #f9f3e1;
+    }
 
-h1,
-h2,
-h3 {
-  text-align: center;
-}
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+    }
 
-.info,
-.submission {
-  text-align: center;
-}
+    .info,
+    .submission {
+      text-align: center;
+    }
 
-/* ---------- Buttons ---------- */
-button {
-  padding: 10px;
-  margin-bottom: 15px;
-  color: #1a3e2d;
-  background: #f9f3e1;
-  border-radius: 5px;
-  border: 2px solid #f9f3e1;
-  cursor: pointer;
-}
+    /* ---------- Buttons ---------- */
+    button {
+      padding: 10px;
+      margin-bottom: 15px;
+      color: #1a3e2d;
+      background: #f9f3e1;
+      border-radius: 5px;
+      border: 2px solid #f9f3e1;
+      cursor: pointer;
+    }
 
-/* ---------- Leaderboard ---------- */
-#leaderboard {
-  background-image:
-    repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
-    repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
-    repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
-    repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px);
-  background-position: left top, right top, left bottom, left top;
-  background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
-  background-size: 100% 5px, 5px 100%, 100% 5px, 5px 100%;
-  border-radius: 5px;
-  padding: 5px 12px;
-}
+    /* ---------- Leaderboard ---------- */
+    #leaderboard {
+      background-image:
+        repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
+        repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
+        repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
+        repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px);
+      background-position: left top, right top, left bottom, left top;
+      background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+      background-size: 100% 5px, 5px 100%, 100% 5px, 5px 100%;
+      border-radius: 5px;
+      padding: 5px 12px;
+    }
 
-.leaderboard-row {
-  display: grid;
-  grid-template-columns: 40px 1fr 80px;
-  padding: 8px;
-  border-bottom: 1px solid #f9f3e1;
-}
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      padding: 8px;
+      border-bottom: 1px solid #f9f3e1;
+    }
 
-.rank {
-  font-weight: bold;
-}
+    .rank {
+      font-weight: bold;
+    }
 
-.dish-name {
-  cursor: pointer;
-  text-decoration: underline;
-}
+    .dish-name {
+      cursor: pointer;
+      text-decoration: underline;
+    }
 
-.avg {
-  text-align: right;
-}
+    .avg {
+      text-align: right;
+    }
 
-/* ---------- Modals ---------- */
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 20%;
-  transform: translateY(-50%);
-  background: white;
-  color: #1a3e2d;
-  border-radius: 5px;
-  padding: 10px;
-  text-align: center;
-  min-width: 250px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
+    /* ---------- Modals ---------- */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 20%;
+      transform: translateY(-50%);
+      background: white;
+      color: #1a3e2d;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      min-width: 250px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
 
-.hidden {
-  display: none;
-}
+    .hidden {
+      display: none;
+    }
 
-form {
-  text-align: left;
-}
+    form {
+      text-align: left;
+    }
 
-label {
-  display: block;
-  margin-bottom: 10px;
-}
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
 
-select {
-  width: 100%;
-  margin-top: 4px;
-}
+    select {
+      width: 100%;
+      margin-top: 4px;
+    }
 
-.modal-actions {
-  margin-top: 15px;
-  text-align: center;
-}
+    .modal-actions {
+      margin-top: 15px;
+      text-align: center;
+    }
 
-.modal-actions>button {
-  border: 2px solid #1a3e2d;
-}
+    .modal-actions>button {
+      border: 2px solid #1a3e2d;
+    }
 
-ul {
-  list-style-type: none;
-  text-align: left;
-}
+    ul {
+      list-style-type: none;
+      text-align: left;
+    }
+    textarea {
+        width: 100%;
+      }
 
-/* ---------- Mobile ---------- */
-@media (max-width: 600px) {
+    /* ---------- Mobile ---------- */
+    @media (max-width: 600px) {
 
-  body {
-    font-size: 16px;
-  }
+      body {
+        font-size: 16px;
+      }
 
-  h1 {
-    font-size: 1.5rem;
-  }
+      h1 {
+        font-size: 1.5rem;
+      }
 
-  h2 {
-    text-align: center;
-  }
+      h2 {
+        text-align: center;
+      }
 
-  /* Leaderboard rows become more flexible */
-  .leaderboard-row {
-    grid-template-columns: 30px 1fr auto;
-    align-items: center;
-    column-gap: 10px;
-    padding: 10px 0;
-  }
+      /* Leaderboard rows become more flexible */
+      .leaderboard-row {
+        grid-template-columns: 30px 1fr auto;
+        align-items: center;
+        column-gap: 10px;
+        padding: 10px 0;
+      }
 
-  .dish-name {
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.3;
-    display: inline-block;
-  }
+      .dish-name {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.3;
+        display: inline-block;
+      }
 
-  .avg {
-    text-align: right;
-    white-space: nowrap;
-  }
-  /* Buttons easier to tap */
-  button {
-    width: 100%;
-    margin-bottom: 10px;
-    font-size: 1rem;
-  }
+      .avg {
+        text-align: right;
+        white-space: nowrap;
+      }
 
-  /* Modals take most of the screen */
-  .modal {
-    left: 5%;
-    right: 5%;
-    top: 50%;
-    transform: translateY(-50%);
-    min-width: unset;
-    width: auto;
-  }
+      /* Buttons easier to tap */
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
 
-  form {
-    font-size: 1rem;
-  }
+      /* Modals take most of the screen */
+      .modal {
+        left: 5%;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        min-width: unset;
+        width: auto;
+      }
 
-  label {
-    font-size: 1rem;
-  }
+      form {
+        font-size: 1rem;
+      }
 
-  select {
-    font-size: 1rem;
-    padding: 8px;
-  }
+      label {
+        font-size: 1rem;
+      }
 
-  ul {
-    padding-left: 20px;
-  }
-}
-</style>
-  
+      select {
+        font-size: 1rem;
+        padding: 8px;
+      }
+
+      ul {
+        padding-left: 20px;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
@@ -231,6 +236,10 @@ ul {
             <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
           </select>
         </label>
+        
+        <label for="comment">Comment (optional)</label>
+        <textarea id="comment" placeholder="Thoughts on the dish?" rows="3">
+        </textarea>
 
         <div class="modal-actions">
           <button type="submit">Submit</button>
@@ -248,13 +257,14 @@ ul {
   </div>
 
   <script>
-    const API_URL =
-      "https://script.google.com/macros/s/AKfycbzuto87-N3th0KIAviv3PSHVG1-d-q2xpAEmh42Y69y3qzumOD9hbZhD0olEpP9M4IX4Q/exec";
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxPifzVJnyUonj1gOqnWFHRD5VwLxrwRZk6mV94Sfa3shgtzRSRFdeANfQnlnYjwkFlvA/exec";
 
-    let dishesCache = [];
-    let peopleCache = [];
-    
-    function renderStars(value) {
+let dishesCache = [];
+let peopleCache = [];
+
+/* ---------- Helpers ---------- */
+function renderStars(value) {
   if (!value) return "—";
 
   const rounded = Math.round(value * 2) / 2;
@@ -264,122 +274,148 @@ ul {
   const hasHalf = rounded % 1 !== 0;
 
   stars += "⭐️".repeat(fullStars);
-
-  if (hasHalf) {
-    stars += "½";
-  }
+  if (hasHalf) stars += "½";
 
   return stars;
 }
 
+/* ---------- Data Loading ---------- */
+async function loadPeople() {
+  const res = await fetch(`${API_URL}?action=getPeople`);
+  peopleCache = await res.json();
+
+  const select = document.getElementById("person-select");
+  select.innerHTML = `<option value="" disabled selected>Select your name</option>`;
+
+  peopleCache.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    select.appendChild(opt);
+  });
+}
+
+async function loadLeaderboard() {
+  const res = await fetch(`${API_URL}?action=getDishes`);
+  dishesCache = await res.json();
+
+  dishesCache.sort((a, b) => (b.average || 0) - (a.average || 0));
+
+  const board = document.getElementById("leaderboard");
+  board.innerHTML = "";
+
+  dishesCache.forEach((dish, index) => {
+    const row = document.createElement("div");
+    row.className = "leaderboard-row";
+    row.innerHTML = `
+      <span class="rank">${index + 1}</span>
+      <span class="dish-name" onclick="viewDetails(${dish.id}, '${dish.name.replace(/'/g, "\\'")}')">
+        ${dish.name}
+      </span>
+      <span class="avg" title="${dish.average ? dish.average.toFixed(2) : ""}">
+        ${renderStars(dish.average)}
+      </span>
+    `;
+    board.appendChild(row);
+  });
+
+  populateDishSelect();
+}
+
+function populateDishSelect() {
+  const select = document.getElementById("dish-select");
+  select.innerHTML = `<option value="" disabled selected>Select a dish</option>`;
+
+  dishesCache.forEach(dish => {
+    const opt = document.createElement("option");
+    opt.value = dish.id;
+    opt.textContent = dish.name;
+    select.appendChild(opt);
+  });
+}
+
+/* ---------- Modals ---------- */
+document.getElementById("add-rating-btn").onclick = () =>
+  document.getElementById("rating-modal").classList.remove("hidden");
+
+document.getElementById("cancel-rating").onclick = () =>
+  document.getElementById("rating-modal").classList.add("hidden");
+
+document.getElementById("close-details").onclick = () =>
+  document.getElementById("details-modal").classList.add("hidden");
+
+/* ---------- Submit Rating ---------- */
+document.getElementById("rating-form").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const dishId = document.getElementById("dish-select").value;
+  const person = document.getElementById("person-select").value;
+  const rating = Number(document.getElementById("rating").value);
+  const comment = document.getElementById("comment")?.value.trim() || "";
+
+  if (!dishId || !person || !rating) return;
+
+  const data = {
+    dish_id: dishId,
+    person,
+    rating,
+    comment
+  };
+
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+
+  // Clear form
+  document.getElementById("rating-form").reset();
+
+  document.getElementById("rating-modal").classList.add("hidden");
+  loadLeaderboard();
+});
+
+/* ---------- Details ---------- */
+async function viewDetails(dishId, dishName) {
+  const res = await fetch(`${API_URL}?action=getRatings&dish_id=${dishId}`);
+  const ratings = await res.json();
+
+  document.getElementById("details-title").textContent = dishName;
+
+  const list = document.getElementById("details-list");
+  list.innerHTML = "";
+
+  ratings.forEach(r => {
+    const li = document.createElement("li");
+
+    const stars = document.createElement("div");
+    stars.textContent = `${r.person}: ${"⭐️".repeat(r.rating)}`;
+    li.appendChild(stars);
+
+    const commentText =
+  r.comment || r.comments || r.note || r.notes || "";
+
+if (commentText) {
+  const comment = document.createElement("div");
+  comment.textContent = commentText;
+  comment.style.fontStyle = "italic";
+  comment.style.opacity = "0.8";
+  comment.style.marginLeft = "1.25rem";
+  comment.style.fontSize = "0.9em";
+  li.appendChild(comment);
+}
 
 
-    /* ---------- Data Loading ---------- */
-    async function loadPeople() {
-      const res = await fetch(`${API_URL}?action=getPeople`);
-      peopleCache = await res.json();
+    list.appendChild(li);
+  });
 
-      const select = document.getElementById("person-select");
-      select.innerHTML = `<option value="" disabled selected>Select your name</option>`;
+  document.getElementById("details-modal").classList.remove("hidden");
+}
 
-      peopleCache.forEach(name => {
-        const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
-        select.appendChild(opt);
-      });
-    }
+/* ---------- Init ---------- */
+loadLeaderboard();
+loadPeople();
+</script>
 
-    async function loadLeaderboard() {
-      const res = await fetch(`${API_URL}?action=getDishes`);
-      dishesCache = await res.json();
-
-      dishesCache.sort((a, b) => (b.average || 0) - (a.average || 0));
-
-      const board = document.getElementById("leaderboard");
-      board.innerHTML = "";
-
-      dishesCache.forEach((dish, index) => {
-        const row = document.createElement("div");
-        row.className = "leaderboard-row";
-        row.innerHTML = `
-          <span class="rank">${index + 1}</span>
-          <span class="dish-name" onclick="viewDetails(${dish.id}, '${dish.name}')">
-            ${dish.name}
-          </span>
-          <span class="avg" title="${dish.average ? dish.average.toFixed(2) : ""}">
-  ${renderStars(dish.average)}
-</span>
-        `;
-        board.appendChild(row);
-      });
-
-      populateDishSelect();
-    }
-
-    function populateDishSelect() {
-      const select = document.getElementById("dish-select");
-      select.innerHTML = `<option value="" disabled selected>Select a dish</option>`;
-
-      dishesCache.forEach(dish => {
-        const opt = document.createElement("option");
-        opt.value = dish.id;
-        opt.textContent = dish.name;
-        select.appendChild(opt);
-      });
-    }
-
-    /* ---------- Modals ---------- */
-    document.getElementById("add-rating-btn").onclick = () =>
-      document.getElementById("rating-modal").classList.remove("hidden");
-
-    document.getElementById("cancel-rating").onclick = () =>
-      document.getElementById("rating-modal").classList.add("hidden");
-
-    document.getElementById("close-details").onclick = () =>
-      document.getElementById("details-modal").classList.add("hidden");
-
-    /* ---------- Submit Rating ---------- */
-    document.getElementById("rating-form").addEventListener("submit", async e => {
-      e.preventDefault();
-
-      const data = {
-        dish_id: document.getElementById("dish-select").value,
-        person: document.getElementById("person-select").value,
-        rating: Number(document.getElementById("rating").value)
-      };
-
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-
-      document.getElementById("rating-modal").classList.add("hidden");
-      loadLeaderboard();
-    });
-
-    /* ---------- Details ---------- */
-    async function viewDetails(dishId, dishName) {
-      const res = await fetch(`${API_URL}?action=getRatings&dish_id=${dishId}`);
-      const ratings = await res.json();
-
-      document.getElementById("details-title").textContent = dishName;
-
-      const list = document.getElementById("details-list");
-      list.innerHTML = "";
-
-      ratings.forEach(r => {
-        const li = document.createElement("li");
-        li.textContent = `${r.person}: ${"⭐️".repeat(r.rating)}`;
-        list.appendChild(li);
-      });
-
-      document.getElementById("details-modal").classList.remove("hidden");
-    }
-
-    /* ---------- Init ---------- */
-    loadLeaderboard();
-    loadPeople();
-  </script>
 </body>
+
 </html>
