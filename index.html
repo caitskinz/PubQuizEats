@@ -51,6 +51,10 @@
         cursor: pointer;
     }
 
+    a:active {
+        color: yellow;
+    }
+
     /* ---------- Leaderboard ---------- */
     #leaderboard {
       background-image:
@@ -261,7 +265,7 @@
         <textarea id="comment" placeholder="Tell us how u really feel" rows="3"></textarea>
 
         <div class="modal-actions">
-          <button type="submit">Submit</button>
+          <button type="submit" id="submit-rating">Submit</button>
           <button type="button" id="cancel-rating">Cancel</button>
         </div>
       </form>
@@ -364,34 +368,85 @@ document.getElementById("close-details").onclick = () =>
   document.getElementById("details-modal").classList.add("hidden");
 
 /* ---------- Submit Rating ---------- */
-document.getElementById("rating-form").addEventListener("submit", async e => {
+/* ---------- Submit Rating ---------- */
+let isSubmittingRating = false;
+
+document.getElementById("rating-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const dishId = document.getElementById("dish-select").value;
-  const person = document.getElementById("person-select").value;
-  const rating = Number(document.getElementById("rating").value);
-  const comment = document.getElementById("comment")?.value.trim() || "";
+  // Hard guard: ignore extra submits while one is in-flight
+  if (isSubmittingRating) return;
+  isSubmittingRating = true;
 
-  if (!dishId || !person || !rating) return;
+  const form = document.getElementById("rating-form");
+  const modal = document.getElementById("rating-modal");
+  const submitBtn = document.getElementById("submit-rating");
+  const cancelBtn = document.getElementById("cancel-rating");
 
-  const data = {
-    dish_id: dishId,
-    person,
-    rating,
-    comment
-  };
+  // Lock UI immediately
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting…";
+  cancelBtn.disabled = true;
 
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  // Optional: prevent changing inputs mid-submit
+  const fields = Array.from(form.querySelectorAll("select, textarea, input"));
+  fields.forEach(el => (el.disabled = true));
+
+  try {
+    const dishId = document.getElementById("dish-select").value;
+    const person = document.getElementById("person-select").value;
+    const rating = Number(document.getElementById("rating").value);
+    const comment = document.getElementById("comment")?.value.trim() || "";
+
+    if (!dishId || !person || !rating) {
+      throw new Error("Missing required fields");
+    }
+
+    const data = { dish_id: dishId, person, rating, comment };
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "text/plain;charset=utf-8" } // avoids CORS/preflight issues common with Apps Script
+    });
+
+    if (!res.ok) throw new Error(`Submit failed (${res.status})`);
+
+    // Success
+    form.reset();
+    modal.classList.add("hidden");
+    await loadLeaderboard();
+  } catch (err) {
+    console.error(err);
+    // Re-enable so they can try again
+    isSubmittingRating = false;
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
+    cancelBtn.disabled = false;
+    fields.forEach(el => (el.disabled = false));
+
+    // Optional: show a message
+    alert("Couldn’t submit right now — please try again.");
+    return;
+  }
+
+  // Unlock (in case you keep the modal open in future)
+  isSubmittingRating = false;
+  submitBtn.disabled = false;
+  submitBtn.textContent = originalBtnText;
+  cancelBtn.disabled = false;
+  fields.forEach(el => (el.disabled = false));
+});
+
 
   // Clear form
   document.getElementById("rating-form").reset();
 
   document.getElementById("rating-modal").classList.add("hidden");
   loadLeaderboard();
-});
+ 
 
 /* ---------- Details ---------- */
 async function viewDetails(dishId, dishName) {
