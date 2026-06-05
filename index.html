@@ -1,526 +1,903 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wet Specimens Eat The Menu</title>
     <style>
-        /* ---------- Base ---------- */
+      /* ---------- Base ---------- */
+      body {
+        font-family: sans-serif;
+        background-color: #1a3e2d;
+        color: #f9f3e1;
+      }
+
+      h1,
+      h2,
+      h3 {
+        text-align: center;
+      }
+
+      .info,
+      .submission {
+        text-align: center;
+      }
+
+      /* ---------- Buttons ---------- */
+      button {
+        padding: 10px;
+        margin-bottom: 15px;
+        color: #1a3e2d;
+        background: #f9f3e1;
+        border-radius: 5px;
+        border: 2px solid #1a3e2d;
+        outline: 1px solid #f9f3e1;
+        cursor: pointer;
+      }
+
+      button:hover {
+        transform: scale(1.1);
+      }
+
+      button:active {
+        padding: 10px;
+        margin-bottom: 15px;
+        color: #f9f3e1;
+        background: #1a3e2d;
+        border-radius: 5px;
+        border: 2px solid #1a3e2d;
+        outline: 1px solid #f9f3e1;
+        cursor: pointer;
+      }
+
+      /* ---------- Leaderboard ---------- */
+      #leaderboard {
+        background-image:
+          repeating-linear-gradient(
+            90deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            180deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            180deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          );
+        background-position:
+          left top,
+          right top,
+          left bottom,
+          left top;
+        background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+        background-size:
+          100% 5px,
+          5px 100%,
+          100% 5px,
+          5px 100%;
+        border-radius: 5px;
+        padding: 5px 12px;
+      }
+
+      .leaderboard-row {
+        display: grid;
+        grid-template-columns: 40px 1fr 80px;
+        padding: 8px;
+        border-bottom: 1px solid #f9f3e1;
+      }
+
+      .rank {
+        font-weight: bold;
+      }
+
+      .dish-name {
+        cursor: pointer;
+        text-decoration: underline;
+        transition:
+          opacity 0.15s ease,
+          transform 0.05s ease;
+        -webkit-tap-highlight-color: transparent;
+        /* nicer on mobile */
+      }
+
+      .dish-name:active {
+        opacity: 0.6;
+        transform: scale(0.98);
+      }
+
+      .dish-name.loading {
+        opacity: 0.5;
+        pointer-events: none;
+        /* prevents double taps */
+        text-decoration: none;
+      }
+
+      .avg {
+        text-align: right;
+      }
+
+      /* ---------- Modals ---------- */
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 20%;
+        transform: translateY(-50%);
+        background: white;
+        color: #1a3e2d;
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+        min-width: 250px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      form {
+        text-align: left;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      select {
+        width: 100%;
+        margin-top: 4px;
+      }
+
+      .modal-actions {
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      .modal-actions > button {
+        border: 2px solid #1a3e2d;
+      }
+
+      ul {
+        list-style-type: none;
+        text-align: left;
+      }
+
+      textarea {
+        width: 100%;
+      }
+
+      /* ---------- Tabs ---------- */
+      .tab-nav {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .tab-btn {
+        margin-bottom: 0;
+        flex: 1;
+        width: auto;
+      }
+      .tab-btn.active {
+        background: #1a3e2d;
+        color: #f9f3e1;
+        outline: 1px solid #f9f3e1;
+      }
+
+      /* ---------- Stats ---------- */
+      #stats-panel {
+        background-image:
+          repeating-linear-gradient(
+            90deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            180deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          ),
+          repeating-linear-gradient(
+            180deg,
+            #f9f3e1,
+            #f9f3e1 5px,
+            transparent 5px,
+            transparent 10px
+          );
+        background-position:
+          left top,
+          right top,
+          left bottom,
+          left top;
+        background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+        background-size:
+          100% 5px,
+          5px 100%,
+          100% 5px,
+          5px 100%;
+        border-radius: 5px;
+        padding: 12px;
+      }
+      .stats-totals {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      .stat-total {
+        padding: 10px 4px;
+        border-bottom: 1px solid #f9f3e1;
+      }
+      .stat-total .num {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+      .stat-total .lbl {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.65;
+      }
+      .section-heading {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.55;
+        margin: 16px 0 8px;
+        border-bottom: 1px solid rgba(249, 243, 225, 0.25);
+        padding-bottom: 4px;
+      }
+      .highlights-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .highlight-card {
+        border: 1px solid rgba(249, 243, 225, 0.3);
+        border-radius: 4px;
+        padding: 10px;
+      }
+      .hl-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        opacity: 0.6;
+        margin-bottom: 4px;
+      }
+      .hl-name {
+        font-weight: bold;
+        margin-bottom: 2px;
+      }
+      .hl-meta {
+        font-size: 0.82rem;
+        opacity: 0.7;
+      }
+      .dist-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+        font-size: 0.85rem;
+      }
+      .dist-track {
+        flex: 1;
+        height: 12px;
+        background: rgba(249, 243, 225, 0.15);
+        border-radius: 2px;
+      }
+      .dist-fill {
+        height: 100%;
+        background: #f9f3e1;
+        border-radius: 2px;
+        transition: width 0.4s ease;
+      }
+      .dist-count {
+        min-width: 24px;
+        font-size: 0.8rem;
+        opacity: 0.65;
+      }
+      .people-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+      .people-table th {
+        text-align: left;
+        padding: 6px 4px;
+        border-bottom: 1px solid #f9f3e1;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.65;
+      }
+      .people-table td {
+        padding: 7px 4px;
+        border-bottom: 1px solid rgba(249, 243, 225, 0.15);
+        vertical-align: top;
+      }
+
+      /* ---------- Mobile ---------- */
+      @media (max-width: 600px) {
         body {
-            font-family: sans-serif;
-            background-color: #1a3e2d;
-            color: #f9f3e1;
+          font-size: 16px;
         }
 
-        h1,
-        h2,
-        h3 {
-            text-align: center;
+        h1 {
+          font-size: 1.5rem;
         }
 
-        .info,
-        .submission {
-            text-align: center;
+        h2 {
+          text-align: center;
         }
 
-        /* ---------- Buttons ---------- */
-        button {
-            padding: 10px;
-            margin-bottom: 15px;
-            color: #1a3e2d;
-            background: #f9f3e1;
-            border-radius: 5px;
-            border: 2px solid #1a3e2d;
-            outline: 1px solid #f9f3e1;
-            cursor: pointer;
-        }
-
-        button:hover {
-            transform: scale(1.1);
-        }
-
-        button:active {
-            padding: 10px;
-            margin-bottom: 15px;
-            color: #f9f3e1;
-            background: #1a3e2d;
-            border-radius: 5px;
-            border: 2px solid #1a3e2d;
-            outline: 1px solid #f9f3e1;
-            cursor: pointer;
-        }
-
-        /* ---------- Leaderboard ---------- */
-        #leaderboard {
-            background-image:
-                repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
-                repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
-                repeating-linear-gradient(90deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px),
-                repeating-linear-gradient(180deg, #f9f3e1, #f9f3e1 5px, transparent 5px, transparent 10px);
-            background-position: left top, right top, left bottom, left top;
-            background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
-            background-size: 100% 5px, 5px 100%, 100% 5px, 5px 100%;
-            border-radius: 5px;
-            padding: 5px 12px;
-        }
-
+        /* Leaderboard rows become more flexible */
         .leaderboard-row {
-            display: grid;
-            grid-template-columns: 40px 1fr 80px;
-            padding: 8px;
-            border-bottom: 1px solid #f9f3e1;
-        }
-
-        .rank {
-            font-weight: bold;
+          grid-template-columns: 30px 1fr auto;
+          align-items: center;
+          column-gap: 10px;
+          padding: 10px 0;
         }
 
         .dish-name {
-            cursor: pointer;
-            text-decoration: underline;
-            transition: opacity 0.15s ease, transform 0.05s ease;
-            -webkit-tap-highlight-color: transparent;
-            /* nicer on mobile */
+          white-space: normal;
+          word-break: break-word;
+          line-height: 1.3;
+          display: inline-block;
         }
-
-        .dish-name:active {
-            opacity: 0.6;
-            transform: scale(0.98);
-        }
-
-        .dish-name.loading {
-            opacity: 0.5;
-            pointer-events: none;
-            /* prevents double taps */
-            text-decoration: none;
-        }
-
 
         .avg {
-            text-align: right;
+          text-align: right;
+          white-space: nowrap;
         }
 
-        /* ---------- Modals ---------- */
+        /* Buttons easier to tap */
+        button {
+          width: 100%;
+          margin-bottom: 10px;
+          font-size: 1rem;
+        }
+
+        button:hover {
+          transform: none;
+        }
+
+        /* Modals take most of the screen */
         .modal {
-            position: fixed;
-            top: 50%;
-            left: 20%;
-            transform: translateY(-50%);
-            background: white;
-            color: #1a3e2d;
-            border-radius: 5px;
-            padding: 10px;
-            text-align: center;
-            min-width: 250px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .hidden {
-            display: none;
+          left: 5%;
+          right: 5%;
+          top: 50%;
+          transform: translateY(-50%);
+          min-width: unset;
+          width: auto;
         }
 
         form {
-            text-align: left;
+          font-size: 1rem;
         }
 
         label {
-            display: block;
-            margin-bottom: 10px;
+          font-size: 1rem;
         }
 
         select {
-            width: 100%;
-            margin-top: 4px;
-        }
-
-        .modal-actions {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .modal-actions>button {
-            border: 2px solid #1a3e2d;
+          font-size: 1rem;
+          padding: 8px;
         }
 
         ul {
-            list-style-type: none;
-            text-align: left;
+          padding-left: 20px;
         }
-
-        textarea {
-            width: 100%;
-        }
-
-        /* ---------- Mobile ---------- */
-        @media (max-width: 600px) {
-
-            body {
-                font-size: 16px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            h2 {
-                text-align: center;
-            }
-
-            /* Leaderboard rows become more flexible */
-            .leaderboard-row {
-                grid-template-columns: 30px 1fr auto;
-                align-items: center;
-                column-gap: 10px;
-                padding: 10px 0;
-            }
-
-            .dish-name {
-                white-space: normal;
-                word-break: break-word;
-                line-height: 1.3;
-                display: inline-block;
-            }
-
-            .avg {
-                text-align: right;
-                white-space: nowrap;
-            }
-
-            /* Buttons easier to tap */
-            button {
-                width: 100%;
-                margin-bottom: 10px;
-                font-size: 1rem;
-            }
-
-            button:hover {
-                transform: none;
-            }
-
-            /* Modals take most of the screen */
-            .modal {
-                left: 5%;
-                right: 5%;
-                top: 50%;
-                transform: translateY(-50%);
-                min-width: unset;
-                width: auto;
-            }
-
-            form {
-                font-size: 1rem;
-            }
-
-            label {
-                font-size: 1rem;
-            }
-
-            select {
-                font-size: 1rem;
-                padding: 8px;
-            }
-
-            ul {
-                padding-left: 20px;
-            }
-        }
+      }
     </style>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <div class="main">
-        <div class="info">
-            <h1>🏆 Wet Specimen(u)s 🏆</h1>
-            <p class="subtitle">Eating everything at Monkey Motel</p>
-        </div>
+      <div class="info">
+        <h1>🏆 Wet Specimen(u)s 🏆</h1>
+        <p class="subtitle">Eating everything at Monkey Motel</p>
+      </div>
 
-        <div class="submission">
-            <button id="add-rating-btn">Submit Rating</button>
-        </div>
+      <div class="submission">
+        <button id="add-rating-btn">Submit Rating</button>
+      </div>
 
-        <h2>Leaderboard</h2>
+      <div class="tab-nav">
+        <button class="tab-btn active" id="tab-leaderboard">Leaderboard</button>
+        <button class="tab-btn" id="tab-stats">Stats</button>
+      </div>
+
+      <div id="leaderboard-panel">
         <div id="leaderboard"></div>
+      </div>
 
-        <!-- Rating Modal -->
-        <div id="rating-modal" class="modal hidden">
-            <form id="rating-form">
-                <h3>Submit Rating</h3>
+      <div id="stats-panel" class="hidden">
+        <p
+          id="stats-loading"
+          style="
+            text-align: center;
+            opacity: 0.6;
+            font-style: italic;
+            padding: 16px 0;
+          "
+        >
+          Loading stats…
+        </p>
+        <div id="stats-content" class="hidden"></div>
+      </div>
 
-                <label>
-                    Who are u?
-                    <select id="person-select" required>
-                        <option value="" disabled selected>Select your name</option>
-                    </select>
-                </label>
+      <!-- Rating Modal -->
+      <div id="rating-modal" class="modal hidden">
+        <form id="rating-form">
+          <h3>Submit Rating</h3>
 
-                <label>
-                    What did u eat?
-                    <select id="dish-select" required>
-                        <option value="" disabled selected>Select a dish</option>
-                    </select>
-                </label>
+          <label>
+            Who are u?
+            <select id="person-select" required>
+              <option value="" disabled selected>Select your name</option>
+            </select>
+          </label>
 
-                <label>
-                    How was it?
-                    <select id="rating" required>
-                        <option value="1">⭐️</option>
-                        <option value="2">⭐️⭐️</option>
-                        <option value="3">⭐️⭐️⭐️</option>
-                        <option value="4">⭐️⭐️⭐️⭐️</option>
-                        <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
-                    </select>
-                </label>
+          <label>
+            What did u eat?
+            <select id="dish-select" required>
+              <option value="" disabled selected>Select a dish</option>
+            </select>
+          </label>
 
-                <label for="comment">Thoughts???? (optional)</label>
-                <textarea id="comment" placeholder="Tell us how u really feel" rows="3"></textarea>
+          <label>
+            How was it?
+            <select id="rating" required>
+              <option value="1">⭐️</option>
+              <option value="2">⭐️⭐️</option>
+              <option value="3">⭐️⭐️⭐️</option>
+              <option value="4">⭐️⭐️⭐️⭐️</option>
+              <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
+            </select>
+          </label>
 
-                <div class="modal-actions">
-                    <button type="submit" id="submit-rating">Submit</button>
-                    <button type="button" id="cancel-rating">Cancel</button>
-                </div>
-            </form>
-        </div>
+          <label for="comment">Thoughts???? (optional)</label>
+          <textarea
+            id="comment"
+            placeholder="Tell us how u really feel"
+            rows="3"
+          ></textarea>
 
-        <!-- Details Modal -->
-        <div id="details-modal" class="modal hidden">
-            <h3 id="details-title"></h3>
-            <ul id="details-list"></ul>
-            <button id="close-details">Close</button>
-        </div>
+          <div class="modal-actions">
+            <button type="submit" id="submit-rating">Submit</button>
+            <button type="button" id="cancel-rating">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Details Modal -->
+      <div id="details-modal" class="modal hidden">
+        <h3 id="details-title"></h3>
+        <ul id="details-list"></ul>
+        <button id="close-details">Close</button>
+      </div>
     </div>
 
     <script>
-        const API_URL =
-            "https://script.google.com/macros/s/AKfycbxPifzVJnyUonj1gOqnWFHRD5VwLxrwRZk6mV94Sfa3shgtzRSRFdeANfQnlnYjwkFlvA/exec";
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbwPA9y2Smo1auf54NcC_FPdUulZ6w9uqprRi8upYrmByL6MCkuKYh4FuC0T1wqlgvQKUQ/exec";
 
-        let dishesCache = [];
-        let peopleCache = [];
+      let dishesCache = [];
+      let peopleCache = [];
 
-        /* ---------- Helpers ---------- */
-        function renderStars(value) {
-            if (!value) return "—";
+      /* ---------- Helpers ---------- */
+      function renderStars(value) {
+        if (!value) return "—";
 
-            const rounded = Math.round(value * 2) / 2;
-            let stars = "";
+        const rounded = Math.round(value * 2) / 2;
+        let stars = "";
 
-            const fullStars = Math.floor(rounded);
-            const hasHalf = rounded % 1 !== 0;
+        const fullStars = Math.floor(rounded);
+        const hasHalf = rounded % 1 !== 0;
 
-            stars += "⭐️".repeat(fullStars);
-            if (hasHalf) stars += "½";
+        stars += "⭐️".repeat(fullStars);
+        if (hasHalf) stars += "½";
 
-            return stars;
-        }
+        return stars;
+      }
 
-        /* ---------- Data Loading ---------- */
-        async function loadPeople() {
-            const res = await fetch(`${API_URL}?action=getPeople`);
-            peopleCache = await res.json();
+      /* ---------- Data Loading ---------- */
+      async function loadPeople() {
+        const res = await fetch(`${API_URL}?action=getPeople`);
+        peopleCache = await res.json();
 
-            const select = document.getElementById("person-select");
-            select.innerHTML = `<option value="" disabled selected>Select your name</option>`;
+        const select = document.getElementById("person-select");
+        select.innerHTML = `<option value="" disabled selected>Select your name</option>`;
 
-            peopleCache.forEach(name => {
-                const opt = document.createElement("option");
-                opt.value = name;
-                opt.textContent = name;
-                select.appendChild(opt);
-            });
-        }
+        peopleCache.forEach((name) => {
+          const opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = name;
+          select.appendChild(opt);
+        });
+      }
 
-        async function loadLeaderboard() {
-            const res = await fetch(`${API_URL}?action=getDishes`);
-            dishesCache = await res.json();
+      async function loadLeaderboard() {
+        const res = await fetch(`${API_URL}?action=getDishes`);
+        dishesCache = await res.json();
 
-            dishesCache.sort((a, b) => (b.average || 0) - (a.average || 0));
+        dishesCache.sort((a, b) => (b.average || 0) - (a.average || 0));
 
-            const board = document.getElementById("leaderboard");
-            board.innerHTML = "";
+        const board = document.getElementById("leaderboard");
+        board.innerHTML = "";
 
-            dishesCache.forEach((dish, index) => {
-                const row = document.createElement("div");
-                row.className = "leaderboard-row";
-                row.innerHTML = `
+        dishesCache.forEach((dish, index) => {
+          const row = document.createElement("div");
+          row.className = "leaderboard-row";
+          row.innerHTML = `
       <span class="rank">${index + 1}</span>
       <span class="dish-name">${dish.name}</span>
       <span class="avg" title="${dish.average ? dish.average.toFixed(2) : ""}">
         ${renderStars(dish.average)}
       </span>
     `;
-                board.appendChild(row);
+          if (dish.status === "retired") {
+            row.style.opacity = "0.45";
+          }
+          board.appendChild(row);
 
-                // ✅ attach click handler INSIDE the loop, where dish/row exist
-                const dishEl = row.querySelector(".dish-name");
-                dishEl.addEventListener("click", () => {
-                    viewDetails(dish.id, dish.name, dishEl);
-                });
-            });
+          // ✅ attach click handler INSIDE the loop, where dish/row exist
+          const dishEl = row.querySelector(".dish-name");
+          dishEl.addEventListener("click", () => {
+            viewDetails(dish.id, dish.name, dishEl);
+          });
+        });
 
-            populateDishSelect();
-        }
+        populateDishSelect();
+      }
 
+      function populateDishSelect() {
+        const select = document.getElementById("dish-select");
+        select.innerHTML = `<option value="" disabled selected>Select a dish</option>`;
 
-        function populateDishSelect() {
-            const select = document.getElementById("dish-select");
-            select.innerHTML = `<option value="" disabled selected>Select a dish</option>`;
+        dishesCache
+          .filter((dish) => dish.status === "active")
+          .forEach((dish) => {
+            const opt = document.createElement("option");
+            opt.value = dish.id;
+            opt.textContent = dish.name;
+            select.appendChild(opt);
+          });
+      }
 
-            dishesCache.forEach(dish => {
-                const opt = document.createElement("option");
-                opt.value = dish.id;
-                opt.textContent = dish.name;
-                select.appendChild(opt);
-            });
-        }
+      /* ---------- Modals ---------- */
+      document.getElementById("add-rating-btn").onclick = () =>
+        document.getElementById("rating-modal").classList.remove("hidden");
 
-        /* ---------- Modals ---------- */
-        document.getElementById("add-rating-btn").onclick = () =>
-            document.getElementById("rating-modal").classList.remove("hidden");
+      document.getElementById("cancel-rating").onclick = () =>
+        document.getElementById("rating-modal").classList.add("hidden");
 
-        document.getElementById("cancel-rating").onclick = () =>
-            document.getElementById("rating-modal").classList.add("hidden");
+      document.getElementById("close-details").onclick = () =>
+        document.getElementById("details-modal").classList.add("hidden");
 
-        document.getElementById("close-details").onclick = () =>
-            document.getElementById("details-modal").classList.add("hidden");
+      /* ---------- Submit Rating ---------- */
+      /* ---------- Submit Rating ---------- */
+      let isSubmittingRating = false;
 
-        /* ---------- Submit Rating ---------- */
-        /* ---------- Submit Rating ---------- */
-        let isSubmittingRating = false;
+      document
+        .getElementById("rating-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-        document.getElementById("rating-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
+          // Hard guard: ignore extra submits while one is in-flight
+          if (isSubmittingRating) return;
+          isSubmittingRating = true;
 
-            // Hard guard: ignore extra submits while one is in-flight
-            if (isSubmittingRating) return;
-            isSubmittingRating = true;
+          const form = document.getElementById("rating-form");
+          const modal = document.getElementById("rating-modal");
+          const submitBtn = document.getElementById("submit-rating");
+          const cancelBtn = document.getElementById("cancel-rating");
 
-            const form = document.getElementById("rating-form");
-            const modal = document.getElementById("rating-modal");
-            const submitBtn = document.getElementById("submit-rating");
-            const cancelBtn = document.getElementById("cancel-rating");
+          // Lock UI immediately
+          const originalBtnText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting…";
+          cancelBtn.disabled = true;
 
-            // Lock UI immediately
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Submitting…";
-            cancelBtn.disabled = true;
+          // Optional: prevent changing inputs mid-submit
+          const fields = Array.from(
+            form.querySelectorAll("select, textarea, input"),
+          );
+          fields.forEach((el) => (el.disabled = true));
 
-            // Optional: prevent changing inputs mid-submit
-            const fields = Array.from(form.querySelectorAll("select, textarea, input"));
-            fields.forEach(el => (el.disabled = true));
+          try {
+            const dishId = document.getElementById("dish-select").value;
+            const person = document.getElementById("person-select").value;
+            const rating = Number(document.getElementById("rating").value);
+            const comment =
+              document.getElementById("comment")?.value.trim() || "";
 
-            try {
-                const dishId = document.getElementById("dish-select").value;
-                const person = document.getElementById("person-select").value;
-                const rating = Number(document.getElementById("rating").value);
-                const comment = document.getElementById("comment")?.value.trim() || "";
-
-                if (!dishId || !person || !rating) {
-                    throw new Error("Missing required fields");
-                }
-
-                const data = { dish_id: dishId, person, rating, comment };
-
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify(data),
-                    headers: { "Content-Type": "text/plain;charset=utf-8" } // avoids CORS/preflight issues common with Apps Script
-                });
-
-                if (!res.ok) throw new Error(`Submit failed (${res.status})`);
-
-                // Success
-                form.reset();
-                modal.classList.add("hidden");
-                await loadLeaderboard();
-            } catch (err) {
-                console.error(err);
-                // Re-enable so they can try again
-                isSubmittingRating = false;
-
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-                cancelBtn.disabled = false;
-                fields.forEach(el => (el.disabled = false));
-
-                // Optional: show a message
-                alert("Couldn’t submit right now — please try again.");
-                return;
+            if (!dishId || !person || !rating) {
+              throw new Error("Missing required fields");
             }
 
-            // Unlock (in case you keep the modal open in future)
+            const data = { dish_id: dishId, person, rating, comment };
+
+            const res = await fetch(API_URL, {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: { "Content-Type": "text/plain;charset=utf-8" }, // avoids CORS/preflight issues common with Apps Script
+            });
+
+            if (!res.ok) throw new Error(`Submit failed (${res.status})`);
+
+            // Success
+            form.reset();
+            modal.classList.add("hidden");
+            await loadLeaderboard();
+            statsCache = null; // force stats to refresh next time they're viewed
+          } catch (err) {
+            console.error(err);
+            // Re-enable so they can try again
             isSubmittingRating = false;
+
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
             cancelBtn.disabled = false;
-            fields.forEach(el => (el.disabled = false));
+            fields.forEach((el) => (el.disabled = false));
+
+            // Optional: show a message
+            alert("Couldn’t submit right now — please try again.");
+            return;
+          }
+
+          // Unlock (in case you keep the modal open in future)
+          isSubmittingRating = false;
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+          cancelBtn.disabled = false;
+          fields.forEach((el) => (el.disabled = false));
         });
 
+      /* ---------- Details ---------- */
+      let detailsLoading = false;
 
-        /* ---------- Details ---------- */
-        let detailsLoading = false;
+      async function viewDetails(dishId, dishName, clickedEl) {
+        if (detailsLoading) return; // prevents spam clicking other dishes mid-load
+        detailsLoading = true;
 
-        async function viewDetails(dishId, dishName, clickedEl) {
-            if (detailsLoading) return; // prevents spam clicking other dishes mid-load
-            detailsLoading = true;
+        // Instant feedback on the tapped dish
+        if (clickedEl) clickedEl.classList.add("loading");
 
-            // Instant feedback on the tapped dish
-            if (clickedEl) clickedEl.classList.add("loading");
+        // Open modal immediately with a loading message
+        const modal = document.getElementById("details-modal");
+        document.getElementById("details-title").textContent = dishName;
 
-            // Open modal immediately with a loading message
-            const modal = document.getElementById("details-modal");
-            document.getElementById("details-title").textContent = dishName;
+        const list = document.getElementById("details-list");
+        list.innerHTML = `<li style="opacity:0.7;font-style:italic;">Loading…</li>`;
+        modal.classList.remove("hidden");
 
-            const list = document.getElementById("details-list");
-            list.innerHTML = `<li style="opacity:0.7;font-style:italic;">Loading…</li>`;
-            modal.classList.remove("hidden");
+        try {
+          const res = await fetch(
+            `${API_URL}?action=getRatings&dish_id=${dishId}`,
+          );
+          const ratings = await res.json();
 
-            try {
-                const res = await fetch(`${API_URL}?action=getRatings&dish_id=${dishId}`);
-                const ratings = await res.json();
+          list.innerHTML = "";
 
-                list.innerHTML = "";
+          ratings.forEach((r) => {
+            const li = document.createElement("li");
 
-                ratings.forEach(r => {
-                    const li = document.createElement("li");
+            const stars = document.createElement("div");
+            stars.textContent = `${r.person}: ${"⭐️".repeat(r.rating)}`;
+            li.appendChild(stars);
 
-                    const stars = document.createElement("div");
-                    stars.textContent = `${r.person}: ${"⭐️".repeat(r.rating)}`;
-                    li.appendChild(stars);
-
-                    const commentText = r.comment || r.comments || r.note || r.notes || "";
-                    if (commentText) {
-                        const comment = document.createElement("div");
-                        comment.textContent = commentText;
-                        comment.style.fontStyle = "italic";
-                        comment.style.opacity = "0.8";
-                        comment.style.marginLeft = "1.25rem";
-                        comment.style.fontSize = "0.9em";
-                        li.appendChild(comment);
-                    }
-
-                    list.appendChild(li);
-                });
-
-                if (ratings.length === 0) {
-                    list.innerHTML = `<li style="opacity:0.7;font-style:italic;">No ratings yet.</li>`;
-                }
-            } catch (err) {
-                console.error(err);
-                list.innerHTML = `<li style="opacity:0.7;font-style:italic;">Couldn’t load ratings. Try again.</li>`;
-            } finally {
-                detailsLoading = false;
-                if (clickedEl) clickedEl.classList.remove("loading");
+            const commentText =
+              r.comment || r.comments || r.note || r.notes || "";
+            if (commentText) {
+              const comment = document.createElement("div");
+              comment.textContent = commentText;
+              comment.style.fontStyle = "italic";
+              comment.style.opacity = "0.8";
+              comment.style.marginLeft = "1.25rem";
+              comment.style.fontSize = "0.9em";
+              li.appendChild(comment);
             }
+
+            list.appendChild(li);
+          });
+
+          if (ratings.length === 0) {
+            list.innerHTML = `<li style="opacity:0.7;font-style:italic;">No ratings yet.</li>`;
+          }
+        } catch (err) {
+          console.error(err);
+          list.innerHTML = `<li style="opacity:0.7;font-style:italic;">Couldn’t load ratings. Try again.</li>`;
+        } finally {
+          detailsLoading = false;
+          if (clickedEl) clickedEl.classList.remove("loading");
         }
+      }
 
-        /* ---------- Init ---------- */
-        loadLeaderboard();
-        loadPeople();
+      /* ---------- Stats ---------- */
+      let statsCache = null;
+
+      document
+        .getElementById("tab-leaderboard")
+        .addEventListener("click", () => {
+          document
+            .getElementById("leaderboard-panel")
+            .classList.remove("hidden");
+          document.getElementById("stats-panel").classList.add("hidden");
+          document.getElementById("tab-leaderboard").classList.add("active");
+          document.getElementById("tab-stats").classList.remove("active");
+        });
+
+      document
+        .getElementById("tab-stats")
+        .addEventListener("click", async () => {
+          document.getElementById("leaderboard-panel").classList.add("hidden");
+          document.getElementById("stats-panel").classList.remove("hidden");
+          document.getElementById("tab-leaderboard").classList.remove("active");
+          document.getElementById("tab-stats").classList.add("active");
+          if (!statsCache) await loadStats();
+        });
+
+      async function loadStats() {
+        const loadingEl = document.getElementById("stats-loading");
+        const contentEl = document.getElementById("stats-content");
+        try {
+          const res = await fetch(`${API_URL}?action=getStats`);
+          statsCache = await res.json();
+          loadingEl.classList.add("hidden");
+          contentEl.classList.remove("hidden");
+          renderStats(statsCache);
+        } catch (err) {
+          console.error(err);
+          loadingEl.textContent = "Couldn't load stats — try again.";
+        }
+      }
+
+      function renderStats(s) {
+        const el = document.getElementById("stats-content");
+        const maxDist = Math.max(...Object.values(s.ratingDist));
+
+        el.innerHTML = `
+    <div class="stats-totals">
+      <div class="stat-total">
+        <span class="num">${s.totalRatings}</span>
+        <span class="lbl">Ratings</span>
+      </div>
+      <div class="stat-total">
+        <span class="num">${s.totalSessions}</span>
+        <span class="lbl">Sessions</span>
+      </div>
+      <div class="stat-total">
+        <span class="num">${s.uniqueRaters}</span>
+        <span class="lbl">Raters</span>
+      </div>
+    </div>
+
+    <p class="section-heading">Highlights</p>
+    <div class="highlights-grid">
+      ${
+        s.topDish
+          ? `
+        <div class="highlight-card">
+          <div class="hl-label">🏆 Top rated</div>
+          <div class="hl-name">${s.topDish.name}</div>
+          <div class="hl-meta">${s.topDish.average.toFixed(2)} avg · ${s.topDish.count} ratings</div>
+        </div>`
+          : ""
+      }
+      ${
+        s.mostOrdered
+          ? `
+        <div class="highlight-card">
+          <div class="hl-label">🔁 Most ordered</div>
+          <div class="hl-name">${s.mostOrdered.name}</div>
+          <div class="hl-meta">${s.mostOrdered.count} ratings · ${s.mostOrdered.average.toFixed(2)} avg</div>
+        </div>`
+          : ""
+      }
+      ${
+        s.flopDish
+          ? `
+        <div class="highlight-card">
+          <div class="hl-label">💀 Biggest flop</div>
+          <div class="hl-name">${s.flopDish.name}</div>
+          <div class="hl-meta">${s.flopDish.average.toFixed(2)} avg · ${s.flopDish.count} ratings</div>
+        </div>`
+          : ""
+      }
+      ${
+        s.mostControversial
+          ? `
+        <div class="highlight-card">
+          <div class="hl-label">🌶️ Most controversial</div>
+          <div class="hl-name">${s.mostControversial.name}</div>
+          <div class="hl-meta">σ ${s.mostControversial.stdDev.toFixed(2)} · ${s.mostControversial.average.toFixed(2)} avg</div>
+        </div>`
+          : ""
+      }
+    </div>
+
+    <p class="section-heading">Rating distribution</p>
+    <div style="margin-bottom:16px;">
+      ${[5, 4, 3, 2, 1]
+        .map(
+          (star) => `
+        <div class="dist-row">
+          <span style="min-width:28px;text-align:right;">${star}★</span>
+          <div class="dist-track">
+            <div class="dist-fill" style="width:${maxDist ? Math.round((s.ratingDist[star] / maxDist) * 100) : 0}%"></div>
+          </div>
+          <span class="dist-count">${s.ratingDist[star]}</span>
+        </div>`,
+        )
+        .join("")}
+    </div>
+
+    <p class="section-heading">The gang</p>
+    <table class="people-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Avg</th>
+          <th>#</th>
+          <th>5⭐️s</th>
+          <th>Fave</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${s.people
+          .map(
+            (p) => `
+          <tr>
+            <td>${p.name}</td>
+            <td>${p.averageGiven.toFixed(2)}</td>
+            <td>${p.totalRatings}</td>
+            <td>${p.fiveStars}</td>
+            <td style="font-size:0.8em;opacity:0.8;">${p.favouriteDish || "—"}</td>
+          </tr>`,
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
+      }
+
+      /* ---------- Init ---------- */
+      loadLeaderboard();
+      loadPeople();
     </script>
-
-</body>
-
+  </body>
 </html>
