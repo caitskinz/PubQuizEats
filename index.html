@@ -250,7 +250,7 @@
       }
       .stats-totals {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 8px;
         margin-bottom: 16px;
         text-align: center;
@@ -420,6 +420,10 @@
         ul {
           padding-left: 20px;
         }
+
+        .stats-totals {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
     </style>
   </head>
@@ -513,7 +517,7 @@
 
     <script>
       const API_URL =
-        "https://script.google.com/macros/s/AKfycbwPA9y2Smo1auf54NcC_FPdUulZ6w9uqprRi8upYrmByL6MCkuKYh4FuC0T1wqlgvQKUQ/exec";
+        "https://script.google.com/macros/s/AKfycbyqI7WW2KEInx8PX31dml3p4Ri_yy45vNrJ7MU_pD9KvBBWahOFRKAzy7MyxTDwDTGR7Q/exec";
 
       let dishesCache = [];
       let peopleCache = [];
@@ -664,6 +668,7 @@
             modal.classList.add("hidden");
             await loadLeaderboard();
             statsCache = null; // force stats to refresh next time they're viewed
+            loadGuinness();
           } catch (err) {
             console.error(err);
             // Re-enable so they can try again
@@ -804,6 +809,10 @@
         <span class="num">${s.uniqueRaters}</span>
         <span class="lbl">Raters</span>
       </div>
+       <div class="stat-total" id="guinness-tile">
+      <span class="num" id="guinness-display">—</span>
+      <span class="lbl">🍺 Guinnesses Drunk </span>
+    </div>
     </div>
 
     <p class="section-heading">Highlights</p>
@@ -893,6 +902,20 @@
       </tbody>
     </table>
   `;
+  loadGuinness();
+      }
+
+      /* ---------- Guinness Counter ---------- */
+      async function loadGuinness() {
+        try {
+          const res = await fetch(`${API_URL}?action=getGuinness`);
+          const data = await res.json();
+          const count = data.count || 0;
+          const el = document.getElementById("guinness-display");
+          if (el) el.textContent = count === 0 ? "—" : count;
+        } catch (err) {
+          console.error(err);
+        }
       }
 
       /* ---------- Init ---------- */
