@@ -52,6 +52,24 @@
         transform: none;
       }
 
+      .wrapped {
+        position: fixed;
+        text-align: center;
+        margin-top: 20px;
+        bottom: 10px;
+        right: 0;
+        background: #1b2d52;
+        padding: 10px;
+        z-index: 1000;
+        border: 1px solid var(--cream);
+        border-radius: 10px;
+      }
+
+      .wrapped a {
+        color: #90d5ff;
+        text-decoration: none;
+      }
+
       /* ---------- Shared dashed box (leaderboard + stats) ---------- */
       .dashed-box {
         --dash: repeating-linear-gradient(
@@ -433,6 +451,10 @@
       <div id="stats-panel" class="dashed-box hidden">
         <p id="stats-loading" class="loading-msg">Loading stats…</p>
         <div id="stats-content" class="hidden"></div>
+      </div>
+
+      <div class="wrapped">
+        <a href="/winterwrapped2026.html">❄️ Winter Wrapped</a>
       </div>
 
       <!-- Rating Modal -->
