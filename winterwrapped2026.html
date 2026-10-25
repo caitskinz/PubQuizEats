@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Monkey Motel Wrapped · Winter 2026</title>
+<style>
+  :root {
+    --page-bg: #f5f5f0;
+    --text: #1a1a1a;
+    --text-2: #666;
+    --border: #ccc;
+    --btn-hover: #e8e8e2;
+    --dot: rgba(0,0,0,.18);
+    --r-lg: 20px;
+    --r-md: 12px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page-bg: #17181a; --text: #ededea; --text-2: #a5a5a0; --border: #44464a;
+      --btn-hover: #26282b; --dot: rgba(255,255,255,.22); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #17181a; --text: #ededea; --text-2: #a5a5a0; --border: #44464a;
+    --btn-hover: #26282b; --dot: rgba(255,255,255,.22); color-scheme: dark;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; font-family: 'Courier New', Courier, monospace; }
+  body { margin: 0; padding: 16px; background: var(--page-bg); color: var(--text); }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  p { margin: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+  .sl { border-radius: var(--r-lg); padding: 2.5rem 2.5rem 2rem; min-height: 520px; display: none; flex-direction: column; cursor: pointer; }
+  .lbl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; margin-bottom: .875rem; display: flex; gap: 6px; align-items: center; }
+  .hero { font-size: clamp(52px, 11vw, 80px); font-weight: 700; line-height: .9; }
+  .ttl { font-size: 20px; font-weight: 700; }
+  .big { font-size: clamp(26px, 5vw, 38px); font-weight: 700; line-height: 1.15; }
+  .cap { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .num { font-size: 30px; font-weight: 700; line-height: 1.1; }
+  .quote { border-left: 3px solid; border-radius: 0 var(--r-md) var(--r-md) 0; padding: 10px 14px; font-size: 13px; line-height: 1.6; margin: 10px 0; font-style: italic; }
+  .note { border-radius: var(--r-md); padding: 10px 14px; font-size: 13px; margin-top: .75rem; }
+  .rank { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-top: .5px solid rgba(0,0,0,.1); }
+  .rank-n { font-size: 24px; font-weight: 700; width: 32px; flex-shrink: 0; }
+  .grow { flex: 1; min-width: 0; }
+  .sm { font-size: 12px; }
+  .row { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .col-c { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: .875rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { background: rgba(0,0,0,.05); border-radius: var(--r-md); padding: 12px; }
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: var(--r-md); white-space: nowrap; }
+  .sq { width: 26px; height: 26px; border-radius: 6px; }
+  .bub { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
+
+  /* comparison table */
+  .vs { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .vs th { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; text-align: right; padding: 0 0 8px; font-weight: 700; }
+  .vs th:first-child { text-align: left; }
+  .vs td { padding: 8px 0; border-top: .5px solid rgba(0,0,0,.1); text-align: right; }
+  .vs td:first-child { text-align: left; }
+  .vs td.w { font-weight: 700; }
+  .up { color: #2f7a2c; } .down { color: #b33a3a; }
+
+  /* distribution bars */
+  .dist { display: grid; grid-template-columns: 34px 1fr; gap: 6px 10px; align-items: center; font-size: 12px; }
+  .bars { display: flex; flex-direction: column; gap: 3px; }
+  .bar { height: 10px; border-radius: 3px; display: flex; align-items: center; }
+  .bar span { font-size: 10px; margin-left: calc(100% + 6px); white-space: nowrap; }
+
+  .nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; }
+  .nbtn { background: transparent; color: var(--text); border: .5px solid var(--border); border-radius: var(--r-md); padding: 6px 14px; cursor: pointer; font-size: 16px; }
+  .nbtn:hover { background: var(--btn-hover); }
+  .nbtn:disabled { opacity: .25; cursor: not-allowed; }
+  .nbtn:focus-visible, .dot:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+  .dot { width: 8px; height: 8px; border-radius: 4px; border: none; padding: 0; cursor: pointer; background: var(--dot); position: relative; transition: width .25s; }
+  .dot::before { content: ''; position: absolute; inset: -8px; }
+  .dot.on { width: 20px; }
+  #ctr { text-align: center; font-size: 12px; color: var(--text-2); margin-top: 8px; }
+  @media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
+
+  @media (max-width: 520px) {
+    body { padding: 10px; }
+    .sl { padding: 1.5rem 1.25rem 1.25rem; min-height: 460px; border-radius: 16px; }
+    .ttl { font-size: 17px; }
+    .row { gap: 1.25rem; }
+    .num { font-size: 24px; }
+    .rank { gap: 8px; }
+    .gang { grid-template-columns: 1fr !important; }
+    .split { grid-template-columns: 1fr !important; }
+    .bub { width: 36px; height: 36px; font-size: 16px; }
+    .sq { width: 20px; height: 20px; }
+    .nbtn { padding: 10px 18px; }
+  }
+</style>
+</head>
+<body>
+<h1 class="sr-only">Monkey Motel Wrapped, Winter Menu 2026</h1>
+<div class="wrap">
+<div id="slc">
+
+  <!-- 0 Cover -->
+  <div class="sl" style="background:#dbe9f4;justify-content:space-between">
+    <p class="lbl" style="color:#2a5a85">❄️ Wet Specimens · Monkey Motel</p>
+    <div>
+      <p class="hero" style="color:#0d2b45;margin-bottom:.3rem">WRAPPED</p>
+      <p style="font-size:clamp(17px,3.5vw,26px);font-weight:700;color:#2a5a85">Winter Menu 2026</p>
+      <p style="font-size:13px;color:#2a5a85;margin-top:.75rem">We ate a lot of food</p>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <p style="font-size:13px;color:#2a5a85">9 Jun – 19 Oct 2026</p>
+      <p style="font-size:13px;color:#2a5a85">9 pals · 22 dishes</p>
+    </div>
+  </div>
+
+  <!-- 1 Numbers -->
+  <div class="sl" style="background:#eeedfe">
+    <p class="lbl" style="color:#534ab7">📊 The numbers</p>
+    <div class="grid2" style="flex:1;align-content:center;margin:.5rem 0">
+      <div style="background:rgba(83,74,183,.12);border-radius:var(--r-md);padding:1.25rem">
+        <p style="font-size:52px;font-weight:700;line-height:1;color:#26215c">98</p>
+        <p class="cap" style="color:#534ab7;margin-top:.2rem">ratings given</p>
+        <p class="sm" style="color:#534ab7;margin-top:.3rem">summer: 104</p>
+      </div>
+      <div style="background:rgba(83,74,183,.12);border-radius:var(--r-md);padding:1.25rem">
+        <p style="font-size:52px;font-weight:700;line-height:1;color:#26215c">22</p>
+        <p class="cap" style="color:#534ab7;margin-top:.2rem">dishes tried</p>
+        <p class="sm" style="color:#534ab7;margin-top:.3rem">summer: 27</p>
+      </div>
+      <div style="background:rgba(83,74,183,.12);border-radius:var(--r-md);padding:1.25rem">
+        <p style="font-size:52px;font-weight:700;line-height:1;color:#26215c">28</p>
+        <p class="cap" style="color:#534ab7;margin-top:.2rem">sessions</p>
+        <p class="sm" style="color:#534ab7;margin-top:.3rem">summer: 16</p>
+      </div>
+      <div style="background:rgba(83,74,183,.12);border-radius:var(--r-md);padding:1.25rem">
+        <p style="font-size:52px;font-weight:700;line-height:1;color:#26215c">3.90</p>
+        <p class="cap" style="color:#534ab7;margin-top:.2rem">avg rating ★</p>
+        <p class="sm" style="color:#534ab7;margin-top:.3rem">summer: 3.61</p>
+      </div>
+    </div>
+    <p style="font-size:13px;color:#534ab7">38 five-star ratings · 3 one-star abominations</p>
+  </div>
+
+  <!-- 2 Head to head -->
+  <div class="sl" style="background:#fff7e0">
+    <p class="lbl" style="color:#8a6500">⚖️ Summer vs winter</p>
+    <p class="ttl" style="color:#3d2d00;margin-bottom:1rem">Winter menu clears</p>
+    <table class="vs" style="color:#3d2d00">
+      <thead><tr><th style="color:#8a6500"></th><th style="color:#8a6500">Summer</th><th style="color:#8a6500">Winter</th></tr></thead>
+      <tbody>
+        <tr><td>Avg rating</td><td>3.61</td><td class="w up">3.90 ▲</td></tr>
+        <tr><td>Five-star ratings</td><td>17</td><td class="w up">38 ▲</td></tr>
+        <tr><td>Share of 5★</td><td>16%</td><td class="w up">39% ▲</td></tr>
+        <tr><td>Comments written</td><td>85</td><td class="w up">97 ▲</td></tr>
+        <tr><td>Ratings given</td><td>104</td><td class="w down">98 ▼</td></tr>
+        <tr><td>One-star ratings</td><td>3</td><td class="w">3 =</td></tr>
+      </tbody>
+    </table>
+    <p class="cap" style="color:#8a6500;margin:1.25rem 0 .6rem">How you voted</p>
+    <div class="dist" style="color:#3d2d00">
+      <p>5★</p><div class="bars"><div class="bar" style="width:32.1%;background:#e3b84a"><span>17</span></div><div class="bar" style="width:71.8%;background:#2a5a85"><span>38</span></div></div>
+      <p>4★</p><div class="bars"><div class="bar" style="width:85%;background:#e3b84a"><span>45</span></div><div class="bar" style="width:56.7%;background:#2a5a85"><span>30</span></div></div>
+      <p>3★</p><div class="bars"><div class="bar" style="width:54.8%;background:#e3b84a"><span>29</span></div><div class="bar" style="width:28.3%;background:#2a5a85"><span>15</span></div></div>
+      <p>2★</p><div class="bars"><div class="bar" style="width:18.9%;background:#e3b84a"><span>10</span></div><div class="bar" style="width:22.7%;background:#2a5a85"><span>12</span></div></div>
+      <p>1★</p><div class="bars"><div class="bar" style="width:5.7%;background:#e3b84a"><span>3</span></div><div class="bar" style="width:5.7%;background:#2a5a85"><span>3</span></div></div>
+    </div>
+    <p class="sm" style="color:#8a6500;margin-top:.9rem"><span style="color:#c99a1f">■</span> summer &nbsp; <span style="color:#2a5a85">■</span> winter. Summer’s favourite score was a safe 4. Winter’s was a 5.</p>
+  </div>
+
+  <!-- 3 Couldn't quit -->
+  <div class="sl" style="background:#faece7">
+    <p class="lbl" style="color:#993c1d">🔁 We have a pie problem</p>
+    <div class="col-c">
+      <p class="cap" style="color:#993c1d;font-weight:700">#1 most ordered</p>
+      <p class="big" style="color:#4a1b0c">Braised Lamb Shoulder Pie</p>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="piesq"></div>
+      <div class="row">
+        <div><p class="num" style="color:#4a1b0c">15×</p><p class="cap" style="color:#993c1d">ordered</p></div>
+        <div><p class="num" style="color:#4a1b0c">4.93 ★</p><p class="cap" style="color:#993c1d">avg rating</p></div>
+        <div><p class="num" style="color:#4a1b0c">6</p><p class="cap" style="color:#993c1d">raters</p></div>
+      </div>
+      <div class="quote" style="border-color:#d85a30;color:#4a1b0c;background:rgba(216,90,48,.08)">“If I was on death row I would ask for the braised shoulder lamb pie from Gibbons Hotel” — Caitlin</div>
+      <div class="quote" style="border-color:#d85a30;color:#4a1b0c;background:rgba(216,90,48,.08)">“Slightly burnt my mouth as I simply couldn’t wait and I can confidently say I would slightly burn my mouth again and again to experience the ethereal goodness of the pie and mash!" - Josh's first ever 5 star review</div>
+      <p class="sm" style="color:#993c1d">Fourteen 5s and one 4 (Harold's peas were cold).</p>
+    </div>
+    <div class="note" style="background:rgba(216,90,48,.1);color:#993c1d">🪦 We hold hands in memory of the braised shoulder lamb pie</div>
+  </div>
+
+  <!-- 4 Honours board -->
+  <div class="sl" style="background:#e1f5ee">
+    <p class="lbl" style="color:#0f6e56">🏆 The honours board</p>
+    <p class="ttl" style="color:#04342c;margin-bottom:1rem">Top 5 by average (3+ ratings)</p>
+    <div style="flex:1">
+      <div class="rank"><p class="rank-n" style="color:#7fcfb3">01</p><div class="grow"><p style="font-weight:700;color:#04342c">Braised Lamb Shoulder Pie</p><p class="sm" style="color:#0f6e56">15 ratings · “a spiritual experience”</p></div><p style="font-weight:700;color:#04342c;white-space:nowrap">4.93</p></div>
+      <div class="rank"><p class="rank-n" style="color:#7fcfb3">02</p><div class="grow"><p style="font-weight:700;color:#04342c">Corn Ribs</p><p class="sm" style="color:#0f6e56">4 ratings · “A big lump with knobs - it has the juice”</p></div><p style="font-weight:700;color:#04342c;white-space:nowrap">4.75</p></div>
+      <div class="rank"><p class="rank-n" style="color:#7fcfb3">03</p><div class="grow"><p style="font-weight:700;color:#04342c">The Big Bad Belly toastie</p><p class="sm" style="color:#0f6e56">7 ratings · limited edition</p></div><p style="font-weight:700;color:#04342c;white-space:nowrap">4.71</p></div>
+      <div class="rank"><p class="rank-n" style="color:#7fcfb3">04</p><div class="grow"><p style="font-weight:700;color:#04342c">Skin on Chips</p><p class="sm" style="color:#0f6e56">3 ratings · “always the best”</p></div><p style="font-weight:700;color:#04342c;white-space:nowrap">4.67</p></div>
+      <div class="rank"><p class="rank-n" style="color:#7fcfb3">05</p><div class="grow"><p style="font-weight:700;color:#04342c">The Porkshire (WOAP)</p><p class="sm" style="color:#0f6e56">8 ratings · “she’s beautiful”</p></div><p style="font-weight:700;color:#04342c;white-space:nowrap">4.25</p></div>
+    </div>
+    <p class="sm" style="color:#0f6e56;margin-top:.75rem">Perfect 5s on just two tries each: Buttermilk Fried Chicken and Fried Halloumi. Three of the top five were winter-only or limited edition, we will never see them again 😔.</p>
+  </div>
+
+  <!-- 5 Controversial -->
+  <div class="sl" style="background:#fbfaf7;padding:0;overflow:hidden">
+    <div style="padding:2rem 2.5rem .875rem">
+      <p class="lbl" style="color:#666">🔥 Most controversial</p>
+      <p class="ttl" style="color:#1a1a1a">The great Caesar schism</p>
+      <p style="font-size:13px;color:#666;margin-top:.2rem">Highest std deviation (2.08) · 3 ratings · avg 3.33</p>
+    </div>
+    <div class="split" style="display:grid;grid-template-columns:1fr 1fr;flex:1">
+      <div style="background:#e1f5ee;padding:1.5rem 1.75rem;display:flex;flex-direction:column;justify-content:flex-end;gap:.5rem">
+        <p style="font-size:20px;color:#1d9e75;letter-spacing:3px">★★★★★</p>
+        <p style="font-size:18px;font-weight:700;color:#04342c">Vic</p>
+        <p style="font-size:13px;color:#0f6e56;font-style:italic;line-height:1.5">“Yum, love, my fave tbh”</p>
+      </div>
+      <div style="background:#fcebeb;padding:1.5rem 1.75rem;display:flex;flex-direction:column;justify-content:flex-end;gap:.5rem">
+        <p style="font-size:20px;color:#e24b4a;letter-spacing:3px">★</p>
+        <p style="font-size:18px;font-weight:700;color:#501313">Jaime</p>
+        <p style="font-size:13px;color:#a32d2d;font-style:italic;line-height:1.5">“Caesar?? I don’t want to know her ..”</p>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#666;padding:.625rem 2.5rem .875rem">Still better than those goddamn churros</p>
+  </div>
+
+  <!-- 6 Discovered too late -->
+  <div class="sl" style="background:#e6f1fb;justify-content:space-between">
+    <p class="lbl" style="color:#185fa5">💎 Discovered too late</p>
+    <div class="col-c">
+      <p class="cap" style="color:#185fa5;font-weight:700">first ordered 1 Sep 2026</p>
+      <p class="big" style="color:#042c53">Buttermilk Fried Chicken</p>
+      <div class="row" style="align-items:flex-end;gap:1.5rem">
+        <div><p style="font-size:44px;font-weight:700;color:#042c53;line-height:1">5.0</p><p class="cap" style="color:#185fa5;margin-top:.15rem">avg rating</p></div>
+        <div style="padding-bottom:6px"><p style="font-size:24px;color:#378add">★★★★★</p><p class="cap" style="color:#185fa5">2 ratings, both Jaime</p></div>
+      </div>
+      <div class="quote" style="border-color:#378add;color:#042c53;background:rgba(55,138,221,.08)">“I have offended this dish by not eating it sooner” — Jaime. Three weeks later: “A CONSISTENT SUCCULENT MEAL????”</div>
+    </div>
+    <div class="note" style="background:rgba(55,138,221,.1);color:#185fa5">💡 Why do we always find these things when it's too late????</div>
+  </div>
+
+  <!-- 7 Repeat offender -->
+  <div class="sl" style="background:#fcebeb">
+    <p class="lbl" style="color:#a32d2d">😐 The abusive relationship</p>
+    <p class="ttl" style="color:#501313;margin-bottom:.25rem">The Halloumi Burger saga</p>
+    <p style="font-size:13px;color:#a32d2d;margin-bottom:1rem">Ordered 10 times. Average: <strong>3.1 / 5</strong>. Nobody loved it. Came back anyway.</p>
+    <div style="flex:1">
+      <div class="rank"><p style="width:60px;font-size:13px;color:#a32d2d">Vic</p><p style="color:#e24b4a;font-size:14px;width:72px;flex-shrink:0">★★★★</p><p class="sm grow" style="color:#791f1f;font-style:italic">“kinda a crazy combo tbh”</p></div>
+      <div class="rank"><p style="width:60px;font-size:13px;color:#a32d2d">Harold</p><p style="color:#e24b4a;font-size:14px;width:72px;flex-shrink:0">★★★</p><p class="sm grow" style="color:#791f1f;font-style:italic">“like a dog that doesn’t bark at passing cars”</p></div>
+      <div class="rank"><p style="width:60px;font-size:13px;color:#a32d2d">Jaime</p><p style="color:#e24b4a;font-size:14px;width:72px;flex-shrink:0">★★</p><p class="sm grow" style="color:#791f1f;font-style:italic">“a huge amount of relish”</p></div>
+      <div class="rank"><p style="width:60px;font-size:13px;color:#a32d2d">Gabs</p><p style="color:#e24b4a;font-size:14px;width:72px;flex-shrink:0">★★★</p><p class="sm grow" style="color:#791f1f;font-style:italic">“an overwhelming taste of cloves”</p></div>
+      <div class="rank"><p style="width:60px;font-size:13px;color:#a32d2d">Harold</p><p style="color:#e24b4a;font-size:14px;width:72px;flex-shrink:0">★★★★</p><p class="sm grow" style="color:#791f1f;font-style:italic">“cheese squeaked and the overwhelming cloy of cloves was absent”</p></div>
+    </div>
+    <div class="note" style="background:rgba(196,80,64,.09);color:#a32d2d">Have they gotten rid of the cloves?? Summer Halloumi redemption arc?</div>
+  </div>
+
+  <!-- 8 Never missed -->
+  <div class="sl" style="background:#eaf3de">
+    <p class="lbl" style="color:#3b6d11">✅ Old reliable</p>
+    <p class="ttl" style="color:#173404;margin-bottom:.75rem">The Big Bad Belly toastie</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.125rem" id="bbb"></div>
+    <div class="row" style="margin-bottom:1.125rem">
+      <div><p style="font-size:36px;font-weight:700;color:#173404">4.71</p><p class="cap" style="color:#3b6d11">avg rating</p></div>
+      <div><p style="font-size:36px;font-weight:700;color:#639922">4</p><p class="cap" style="color:#3b6d11">lowest score</p></div>
+      <div><p style="font-size:36px;font-weight:700;color:#173404">5</p><p class="cap" style="color:#3b6d11">raters</p></div>
+    </div>
+    <div class="quote" style="border-color:#639922;color:#173404;background:rgba(99,153,34,.09);margin-bottom:.5rem">“I’m lowkey glad it’s limited edition so I can reminisce in the future and reflect on its glory” — Josh</div>
+    <div class="quote" style="border-color:#639922;color:#173404;background:rgba(99,153,34,.09)">“Fuck yes” — Jaime</div>
+    <p class="sm" style="color:#3b6d11;margin-top:.625rem">Summer’s Old Reliable was the Vegan Cheesecake (six 4s). The toastie clears (bring it back!)</p>
+  </div>
+
+  <!-- 9 Movers -->
+  <div class="sl" style="background:#f3eefa">
+    <p class="lbl" style="color:#6a3d9a">📈 Same dish, new season</p>
+    <p class="ttl" style="color:#2d1747;margin-bottom:1rem">How the year-round menu moved</p>
+    <div style="flex:1">
+      <div class="rank"><div class="grow"><p style="font-weight:700;color:#2d1747">Steak Sando</p><p class="sm" style="color:#6a3d9a">10 → 5 ratings</p></div><p style="color:#2d1747;white-space:nowrap">3.70 → <strong class="up">4.20 ▲</strong></p></div>
+      <div class="rank"><div class="grow"><p style="font-weight:700;color:#2d1747">Corn Ribs</p><p class="sm" style="color:#6a3d9a">2 → 4 ratings (retired now 😔)</p></div><p style="color:#2d1747;white-space:nowrap">4.50 → <strong class="up">4.75 ▲</strong></p></div>
+      <div class="rank"><div class="grow"><p style="font-weight:700;color:#2d1747">Beef Nachos</p><p class="sm" style="color:#6a3d9a">“Chips are simply too many”</p></div><p style="color:#2d1747;white-space:nowrap">3.00 → <strong class="up">3.25 ▲</strong></p></div>
+      <div class="rank"><div class="grow"><p style="font-weight:700;color:#2d1747">Skin on Chips</p><p class="sm" style="color:#6a3d9a">still elite</p></div><p style="color:#2d1747;white-space:nowrap">5.00 → <strong class="down">4.67 ▼</strong></p></div>
+      <div class="rank"><div class="grow"><p style="font-weight:700;color:#2d1747">Mediterranean Salad</p><p class="sm" style="color:#6a3d9a">“BRING BACK THE CHICKEN”</p></div><p style="color:#2d1747;white-space:nowrap">4.25 → <strong class="down">3.80 ▼</strong></p></div>
+      <div class="rank"><div class="grow"><p style="font-weight:700;color:#2d1747">Double Smashed Wagyu</p><p class="sm" style="color:#6a3d9a">“Dry as a crisp today guys”</p></div><p style="color:#2d1747;white-space:nowrap">4.00 → <strong class="down">3.00 ▼</strong></p></div>
+    </div>
+    <p class="sm" style="color:#6a3d9a;margin-top:.75rem">Raise your hand if you've every been personally vitimised by the removal of grilled chicken.</p>
+  </div>
+
+  <!-- 10 Desserts + kitchen report -->
+  <div class="sl" style="background:#f6e9ef">
+    <p class="lbl" style="color:#93325f">🍮 Dessert disaster</p>
+    <p class="ttl" style="color:#43122a;margin-bottom:.25rem">Chef forgot how to do desserts, maybe it's bc they're a gorilla and not a chimpanzee??</p>
+    <div class="row" style="margin:1rem 0">
+      <div><p class="num" style="color:#c48aa5">3.48</p><p class="cap" style="color:#93325f">summer desserts</p></div>
+      <div><p class="num" style="color:#43122a">2.13</p><p class="cap" style="color:#93325f">winter desserts</p></div>
+    </div>
+    <div class="rank"><div class="grow"><p style="font-weight:700;color:#43122a">Apple Crumble</p><p class="sm" style="color:#93325f;font-style:italic">“why did it taste like peanuts”</p></div><p style="font-weight:700;color:#43122a">2.40</p></div>
+    <div class="rank"><div class="grow"><p style="font-weight:700;color:#43122a">Sticky Date Pudding</p><p class="sm" style="color:#93325f;font-style:italic">“like cake but worse” and wtf was up with the popcorn?</p></div><p style="font-weight:700;color:#43122a">1.67</p></div>
+    <div class="rank" style="margin-bottom:1rem"><div class="grow"><p style="font-weight:700;color:#43122a">Vegan Choc & Berry Delice</p><p class="sm" style="color:#93325f">nobody dared</p></div><p style="font-weight:700;color:#43122a">–</p></div>
+    <p class="cap" style="color:#93325f;font-weight:700;margin-bottom:.5rem">🧑‍🍳 Kitchen report</p>
+    <div class="grid2">
+      <div class="card"><p class="num" style="color:#43122a">7×</p><p class="sm" style="color:#93325f">“dry” in a comment. Those ratings averaged <strong>2.0★</strong></p></div>
+      <div class="card"><p class="num" style="color:#43122a">6×</p><p class="sm" style="color:#93325f">“cold”: puds, peas, mash, custard and ice cream (pretty sure that one's meant to be cold)</p></div>
+    </div>
+    <p class="sm" style="color:#93325f;margin-top:.75rem;font-style:italic">“Hello dear, you need to moisturize.” — Jaime, to the Chicken Parma</p>
+  </div>
+
+  <!-- 11 The gang -->
+  <div class="sl" style="background:#f1efe8;padding:2rem 2rem 1.75rem">
+    <p class="lbl" style="color:#5f5e5a">👥 The gang</p>
+    <p class="ttl" style="color:#2c2c2a;margin-bottom:.25rem">9 specimens, one menu</p>
+    <p class="sm" style="color:#5f5e5a;margin-bottom:.875rem">Everyone rated higher than summer. Change vs summer in brackets.</p>
+    <div class="grid2 gang" style="gap:9px;flex:1">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Jaime</p><span class="badge" style="color:#0f6e56;background:#e1f5ee">most prolific</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">3.81 avg <span class="up">(+0.54)</span> · 26 ratings · 11 fives</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">last summer’s critic, now the MVP</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Grace</p><span class="badge" style="color:#854f0b;background:#faeeda">most generous</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">4.00 avg <span class="up">(+0.42)</span> · 10 ratings · 5 fives</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">half her ratings were 5s · fave: the pie</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Harold</p><span class="badge" style="color:#993c1d;background:#faece7">most committed</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">4.00 avg <span class="up">(+0.35)</span> · 18 ratings · 7 fives</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">ordered the pie 4 times, even with family</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Josh</p><span class="badge" style="color:#185fa5;background:#e6f1fb">centrist no more</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">3.92 avg <span class="up">(+0.36)</span> · 13 ratings · 5 fives</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">zero 1s or 5s last summer · gave both this winter</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Caitlin</p><span class="badge" style="color:#a1286f;background:#fdeaf6">just happy to be here</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">3.85 avg <span class="up">(+0.29)</span> · 13 ratings · 4 fives</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">all four 5s were the pie</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Gabs</p><span class="badge" style="color:#c9a646;background:#1b1512">big guzz the Guinness</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">3.82 avg <span class="up">(+0.22)</span> · 11 ratings · 4 fives</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">fave: the pie, “still fuckin delectable”</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Vic</p><span class="badge" style="color:#534ab7;background:#eeedfe">hibernating</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">4.00 avg <span class="up">(+0.15)</span> · 5 ratings</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">down from 20 last summer · fave: Caesar Salad</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Wynn</p><span class="badge" style="color:#3b6d11;background:#eaf3de">one and done</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">5.00 avg <span class="up">(+2.00)</span> · 1 rating</p>
+        <p style="font-size:11px;color:#888780;margin-top:.1rem">Skin on Chips: “Too much salt. But I did that myself xo”</p>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <div style="display:flex;justify-content:space-between;gap:6px"><p style="font-weight:700;color:#2c2c2a">Matthew</p><span class="badge" style="color:#854f0b;background:#faeeda">tourist</span></div>
+        <p class="sm" style="color:#5f5e5a;margin-top:.25rem">3.00 avg · 1 rating · Chicken Burger: “More chicken please!”</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11b Unhinged awards -->
+  <div class="sl" style="background:#dff3f7">
+    <p class="lbl" style="color:#12707f">📝 We wrote a movie?</p>
+    <p class="ttl" style="color:#06343c;margin-bottom:.75rem">Why are we like this?</p>
+    <div style="flex:1">
+      <div class="rank"><div class="grow"><p class="sm" style="color:#12707f;font-weight:700">Please seek help · Harold</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“i wanna fuck this pie”</p></div><p style="color:#3fb3c4;white-space:nowrap;font-size:13px">★★★★★</p></div>
+      <div class="rank"><div class="grow"><p class="sm" style="color:#12707f;font-weight:700">RuPaul, look out · Jaime</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“Hello dear, you need to moisturize.” (to the Chicken Parma)</p></div><p style="color:#3fb3c4;white-space:nowrap;font-size:13px">★★</p></div>
+      <div class="rank"><div class="grow"><p class="sm" style="color:#12707f;font-weight:700">Devastating · Harold</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“if someone who had only ever made mulled wine wanted to make a halloumi burger”</p></div><p style="color:#3fb3c4;white-space:nowrap;font-size:13px">★★★</p></div>
+      <div class="rank"><div class="grow"><p class="sm" style="color:#12707f;font-weight:700">Bars · Jaime, Corn Ribs (twice, same night)</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“ITS CORN” and “A big lump with knobs - it has the juice”</p></div><p style="color:#3fb3c4;white-space:nowrap;font-size:13px">5★ ×2</p></div>
+      <div class="rank"><div class="grow"><p class="sm" style="color:#12707f;font-weight:700">No one asked · Caitlin</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“Dropped a tomato on the floor sorry”</p></div><p style="color:#3fb3c4;white-space:nowrap;font-size:13px">★★★★</p></div>
+    </div>
+    <div class="grid2" style="margin-top:.75rem">
+      <div class="card"><p class="num" style="color:#06343c">77</p><p class="sm" style="color:#12707f">words in Josh’s pie review. “The peas did exactly what peas should do.”</p></div>
+      <div class="card"><p class="num" style="color:#06343c">12:15am</p><p class="sm" style="color:#12707f">Josh gives the Sticky Date Pudding 1★. Never review dessert after midnight.</p></div>
+    </div>
+  </div>
+<!-- 11c pre karaoke -->
+  <div class="sl" style="background:#fdeaf6">
+    <p class="lbl" style="color:#a1286f">🏆 Ain't it fun?</p>
+    <p class="ttl" style="color:#4a0d33;margin-bottom:.75rem">An ode to pre-karaoke</p>
+    <div style="flex:1">
+      <div class="rank"><div class="grow"><p class="sm" style="color:#a1286f;font-weight:700">Harold - Steak Sando</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“crunchy bread no cheese gives me a boner”</p></div><p style="color:#d14a96;white-space:nowrap;font-size:13px">5★</p></div>
+      <div class="rank"><div class="grow"><p class="sm" style="color:#a1286f;font-weight:700">Harold - Steak Sando, approximately 90 seconds later</p><p style="color:#4a0d33;font-style:italic;font-size:14px">“bread kinda soggy. why do you hate me” ...what happened in those 90 seconds?</p></div><p style="color:#d14a96;white-space:nowrap;font-size:13px">4★</p></div>
+      <div class="rank"><div class="grow"><p class="sm" style="color:#a1286f;font-weight:700">Jaime</p><p style="color:#4a0d33;font-style:italic;font-size:14px">"Hello you? No. Halloumi x"</p></div><p style="color:#d14a96;white-space:nowrap;font-size:13px">★★★★★</p></div>
+    </div>
+    <div class="grid2" style="margin-top:.75rem">
+      <div class="card"><p class="num" style="color:#4a0d33">360</p><p class="sm" style="color:#a1286f">dollars of quiz winnings spent</p></div>
+      <div class="card"><p class="num" style="color:#4a0d33">1:15am</p><p class="sm" style="color:#a1286f">Jaime thinking about hallolumi</p></div>
+    </div>
+  </div>
+
+  <!-- 12 Wrap -->
+  <div class="sl" style="background:#dbe9f4;justify-content:space-between">
+    <p class="lbl" style="color:#2a5a85">🏅 That’s a wrap</p>
+    <div>
+      <p style="font-size:56px;font-weight:700;color:#0d2b45;line-height:1">98</p>
+      <p style="font-size:14px;color:#2a5a85;margin:.2rem 0 1.25rem">ratings given, Jun – Oct 2026</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem">
+        <div style="background:rgba(61,109,17,.14);border-radius:var(--r-md);padding:.75rem;text-align:center"><p style="font-size:22px;font-weight:700;color:#27500a">38</p><p class="cap" style="color:#3b6d11">five ★</p></div>
+        <div style="background:rgba(13,43,69,.08);border-radius:var(--r-md);padding:.75rem;text-align:center"><p style="font-size:22px;font-weight:700;color:#0d2b45">30</p><p class="cap" style="color:#2a5a85">four ★</p></div>
+        <div style="background:rgba(196,80,64,.1);border-radius:var(--r-md);padding:.75rem;text-align:center"><p style="font-size:22px;font-weight:700;color:#501313">3</p><p class="cap" style="color:#a32d2d">one ★</p></div>
+      </div>
+      <p style="font-size:22px;font-weight:700;color:#0d2b45;margin-bottom:.5rem">The summer menu time!</p>
+      <p style="font-size:15px;color:#2a5a85">We are living in a post Braised Lamb Shoulder Pie world now.</p>
+    </div>
+    <div style="background:rgba(13,43,69,.07);border-radius:var(--r-md);padding:1rem 1.25rem;display:flex;gap:12px;align-items:center">
+      <span style="font-size:24px" aria-hidden="true">🍹</span>
+      <div>
+        <p style="font-weight:700;color:#0d2b45;font-size:15px">Mission for summer</p>
+        <p style="font-size:13px;color:#2a5a85;margin-top:.1rem">Drink the new tequila menu?</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav">
+  <button class="nbtn" id="prev" aria-label="Previous slide">←</button>
+  <div style="display:flex;gap:6px;align-items:center" id="dots"></div>
+  <button class="nbtn" id="next" aria-label="Next slide">→</button>
+</div>
+<p id="ctr"></p>
+</div>
+
+<script>
+(function () {
+  // pie squares: 14 fives, 1 four
+  const pie = document.getElementById("piesq");
+  for (let i = 0; i < 15; i++) {
+    const d = document.createElement("div");
+    d.className = "sq";
+    d.style.background = i === 14 ? "#eaa286" : "#d85a30";
+    pie.appendChild(d);
+  }
+  // toastie bubbles
+  const bbb = document.getElementById("bbb");
+  [5,5,5,4,5,4,5].forEach(v => {
+    const d = document.createElement("div");
+    d.className = "bub";
+    d.textContent = v;
+    d.style.background = v === 5 ? "rgba(61,109,17,.3)" : "rgba(61,109,17,.15)";
+    d.style.color = "#27500a";
+    bbb.appendChild(d);
+  });
+
+  const slides = Array.from(document.querySelectorAll("#slc > .sl"));
+  const dotsEl = document.getElementById("dots");
+  const prev = document.getElementById("prev");
+  const next = document.getElementById("next");
+  const ctr = document.getElementById("ctr");
+  const n = slides.length;
+  let cur = 0;
+  slides.forEach((_, i) => {
+    const d = document.createElement("button");
+    d.className = "dot";
+    d.setAttribute("aria-label", "Go to slide " + (i + 1));
+    d.onclick = (e) => { e.stopPropagation(); show(i); };
+    dotsEl.appendChild(d);
+  });
+  const dots = dotsEl.querySelectorAll(".dot");
+  function show(idx) {
+    slides[cur].style.display = "none";
+    dots[cur].classList.remove("on");
+    dots[cur].style.background = "";
+    cur = Math.max(0, Math.min(n - 1, idx));
+    slides[cur].style.display = "flex";
+    dots[cur].classList.add("on");
+    dots[cur].style.background = getComputedStyle(slides[cur].querySelector(".lbl")).color;
+    prev.disabled = cur === 0;
+    next.disabled = cur === n - 1;
+    ctr.textContent = (cur + 1) + " / " + n + " · use ← → keys or tap the card";
+  }
+  let sx = 0;
+  const slc = document.getElementById("slc");
+  slc.addEventListener("touchstart", e => { sx = e.changedTouches[0].clientX; }, { passive: true });
+  slc.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 40) dx < 0 ? show(cur + 1) : show(cur - 1);
+  }, { passive: true });
+  prev.onclick = () => show(cur - 1);
+  next.onclick = () => show(cur + 1);
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight") show(cur + 1);
+    if (e.key === "ArrowLeft") show(cur - 1);
+  });
+  slc.addEventListener("click", e => {
+    const r = slc.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    if (x > r.width * 0.6) show(cur + 1);
+    else if (x < r.width * 0.4) show(cur - 1);
+  });
+  show(0);
+})();
+</script>
+</body>
+</html>
